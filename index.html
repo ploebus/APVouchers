@@ -10,13 +10,14 @@
 <script src="leaflet/leaflet.label.js"></script>
 <script src="js/jquery.js"></script>
 <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
-<script src="APVoucherSites.js"></script>
+<script src="APVouchers.js"></script>
+
 
 <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 <style>
 #mapid {height:680px;}
-.label {color:#333333;font-weight: bold}
+.label {color:blue;font-weight: bold}
 </style>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -35,8 +36,8 @@
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">HOME</a></li>
-    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">SITES</a></li>
-    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">DATA</a></li>
+    <li role="presentation" class="sites"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">SITES</a></li>
+    <li role="presentation" class="kids"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">KIDS</a></li>
     <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">BLANK</a></li>
   </ul>
 
@@ -44,8 +45,19 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="home">
     <h3>AP Voucher Map</h3>
-    This is where you can explore the locations of AP Voucher Usage!
-
+    This is where you can explore the locations of AP Voucher usage both by number of providers and number of children served.
+    <hr />
+    <h5><strong>STEP 1:</strong> SELECT AGENCY</h5>
+		<ul class="nav" id='agency'>
+              <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
+			  <li><a data-match= 'AP_BAN' href="#">BANANAS</a></li>
+              <li><a data-match= 'AP_CHILD' href="#about">CHILD CARE LINKS</a></li>
+              <li><a data-match= 'AP_CFCR' href="#contact">CHILDREN AND FAMILY RESOURCE CENTER</a></li>
+              <li><a data-match= 'AP_DAVIS' href="#contact">DAVIS STREET</a></li>
+              <li><a data-match= 'AP_C4' href="#contact">4C OF ALAMEDA COUNTY</a></li>
+			
+            </ul>
+            <hr />
     Please use the selection tab to choose which Agency you are interested in and the type of site.
     <p style="margin-top:15px"><svg width="30" height="15">
 		  		<rect width="30" height="15" style="fill:#0000ff;fill-opacity:0.5;stroke-width:1;stroke:rgb(0,0,0)" />
@@ -59,23 +71,23 @@ at least one site</p>
 		
 		<H4>FIND # OF PROVIDERS BY AGENCY</H4>
 
-		<h5>BY AGENCY</h5>
-		<ul class="nav" id='agency'>
-              <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
-			  <li><a data-match= 'AP_BAN' href="#">BANANAS</a></li>
-              <li><a data-match= 'AP_CHILD' href="#about">CHILD CARE LINKS</a></li>
-              <li><a data-match= 'AP_CFCR' href="#contact">CHILDREN AND FAMILY RESOURCE CENTER</a></li>
-              <li><a data-match= 'AP_DAVIS' href="#contact">DAVIS STREET</a></li>
-              <li><a data-match= 'AP_C4' href="#contact">4C OF ALAMEDA COUNTY</a></li>
-			
-            </ul>
-            <hr />
-		<h5>BY TYPE OF SITE</h5>	
+		
+		
+		<h5>HOW MANY PROVIDER SITES FOR THAT AGENCY</h5>	
             <ul class="nav" id='siteType'>
               <li class="active"><a data-match= 'sites' href="#">ALL SITES</a></li>
 			  <li><a data-match= 'FFN' href="#">FRIENDS AND FAMILY</a></li>
               <li><a data-match= 'FCC' href="#about">FAMILY CHILD CARE</a></li>
               <li><a data-match= 'CTR' href="#contact">CHILD CARE CENTERS</a></li>
+			
+            </ul>
+           <hr />
+        <h5>HOW MANY CHILDREN FOR THAT AGENCY</h5>	
+            <ul class="nav" id='siteType'>
+              <li class="active"><a data-match= 'KID' href="#">ALL AGES</a></li>
+			  <li><a data-match= 'INF' href="#">INFANT</a></li>
+              <li><a data-match= 'TOT' href="#about">TODDLER</a></li>
+              <li><a data-match= 'PRE' href="#contact">PRESCHOOL</a></li>
 			
             </ul>
          
@@ -85,11 +97,25 @@ at least one site</p>
     	
     	<div>
     		<H3 id='tractSelected'></H3>
-    		BANANAS <p id="selectedBanana"></p>
-    		CHILD CARE LINKS <p id="selectedCCL"></p>
-    		DAVIS STREET <p id="selectedDAVIS"></p>
-    		CHILDREN AND FAMILY RESOURCES <p id="selectedDAVIS"></p>
-
+    		<h5>BY AGENCY</h5>
+			<ul class="nav" id='agency_kid'>
+              <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
+			  <li><a data-match= 'AK_BAN' href="#">BANANAS</a></li>
+              <li><a data-match= 'AK_LINK' href="#about">CHILD CARE LINKS</a></li>
+              <li><a data-match= 'AK_CFCR' href="#contact">CHILDREN AND FAMILY RESOURCE CENTER</a></li>
+              <li><a data-match= 'AK_DAVIS' href="#contact">DAVIS STREET</a></li>
+              <li><a data-match= 'AK_C4' href="#contact">4C OF ALAMEDA COUNTY</a></li>
+			
+            </ul>
+            <hr />
+		<h5>BY TYPE OF SITE</h5>	
+            <ul class="nav" id='siteType_kid'>
+              <li class="active"><a data-match= 'KID' href="#">ALL AGES</a></li>
+			  <li><a data-match= 'INF' href="#">INFANTS</a></li>
+              <li><a data-match= 'TOT' href="#about">TODDLERS</a></li>
+              <li><a data-match= 'PRE' href="#contact">PRESCHOOL</a></li>
+			
+            </ul>
 
     	</div>
 
@@ -120,6 +146,7 @@ var map = L.map( 'mapid', {
 });
 
 
+
 L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright" title="OpenStreetMap" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" title="MapQuest" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" width="16" height="16">',
     subdomains: ['otile1','otile2','otile3','otile4']
@@ -127,13 +154,22 @@ L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
 
 
 
+
+
+
+
+
 var myStyle = {
-	color:"#0000ff",
-	weight:1
+	color:'black',
+	weight:.5,
+	dashArray:3,
+	fillColor:'white',
+	opacity:.3
+
 }
 
 //add first time load of data
-var siteLayer =	L.geoJson(sites,
+var siteLayer =	L.geoJson(tracts,
 	{style:function(feature){
 		switch(feature.properties.APALL_sites){
 			case 0: return{color:"#000000",weight:.5};
@@ -163,9 +199,9 @@ function getOpacity(d){
 function style(feature) {
     return {
         fillColor: getColor(feature.properties[selectedProperty]),
-        weight: 2,
+        weight: .5,
         opacity: 1,
-        color: 'white',
+        color: 'black',
         dashArray: '3',
         fillOpacity: getOpacity(feature.properties[selectedProperty])
     };
@@ -176,7 +212,7 @@ function updateMap(){
 	var labelMarkers = []
 	//change siteLayer
 	selectedProperty = theAgency + '_' + theType
-	var siteLayer =	L.geoJson(sites,{
+	var siteLayer =	L.geoJson(tracts,{
 		style:style,
 		onEachFeature:function(feature, layer){
 			 layer.bindPopup(feature.properties.TRACTCE);
@@ -190,7 +226,9 @@ function updateMap(){
 			 		html:"<h5>" + feature.properties[theAgency + '_' + theType] + "</h5>",
 			 		iconSize:[100, 40]
 
+
 			 	})
+			 	
 			 	})
 			 	theSites.addLayer(label)
 			 }}
@@ -223,6 +261,7 @@ $("#siteType a").click(function(a){
 $("#agency a").click(function(a){
 	theAgency = $(this).attr('data-match');
 	console.log(theAgency)
+	$(".sites a").tab('show');
 	updateMap()
 	$("#lblAgency").text("AGENCY: " + $(this).text())
 	//remove layer
