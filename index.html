@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+
+<link rel="stylesheet" href="leaflet/leaflet.css" />
+<link rel="stylesheet" href="leaflet/leaflet.label.css" />
+<script src="leaflet/leaflet.js"></script>
+<script src="leaflet/leaflet.label.js"></script>
+<script src="js/jquery.js"></script>
+<script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+<script src="APVoucherSites.js"></script>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+#mapid {height:680px;}
+.label {color:#333333;font-weight: bold}
+</style>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+       <h2 style='color:white'>Alternative Payment Vouchers</h2>
+        </div>
+      </div>
+    </div>
+
+<div class="container-fluid" style="margin-top:70px">
+	
+	<div id='sideBar' class='col-md-3'>
+	<div>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">HOME</a></li>
+    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">SITES</a></li>
+    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">DATA</a></li>
+    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">BLANK</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="home">
+    <h3>AP Voucher Map</h3>
+    This is where you can explore the locations of AP Voucher Usage!
+
+    Please use the selection tab to choose which Agency you are interested in and the type of site.
+    <p style="margin-top:15px"><svg width="30" height="15">
+		  		<rect width="30" height="15" style="fill:#0000ff;fill-opacity:0.5;stroke-width:1;stroke:rgb(0,0,0)" />
+			</svg> 
+at least one site</p>
+    </div>
+		
+		
+    <div role="tabpanel" class="tab-pane" id="profile"><h5 id="lblAgency"></h5>
+		<h5 id="lblType"></h5>
+		
+		<H4>FIND # OF PROVIDERS BY AGENCY</H4>
+
+		<h5>BY AGENCY</h5>
+		<ul class="nav" id='agency'>
+              <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
+			  <li><a data-match= 'AP_BAN' href="#">BANANAS</a></li>
+              <li><a data-match= 'AP_CHILD' href="#about">CHILD CARE LINKS</a></li>
+              <li><a data-match= 'AP_CFCR' href="#contact">CHILDREN AND FAMILY RESOURCE CENTER</a></li>
+              <li><a data-match= 'AP_DAVIS' href="#contact">DAVIS STREET</a></li>
+              <li><a data-match= 'AP_C4' href="#contact">4C OF ALAMEDA COUNTY</a></li>
+			
+            </ul>
+            <hr />
+		<h5>BY TYPE OF SITE</h5>	
+            <ul class="nav" id='siteType'>
+              <li class="active"><a data-match= 'sites' href="#">ALL SITES</a></li>
+			  <li><a data-match= 'FFN' href="#">FRIENDS AND FAMILY</a></li>
+              <li><a data-match= 'FCC' href="#about">FAMILY CHILD CARE</a></li>
+              <li><a data-match= 'CTR' href="#contact">CHILD CARE CENTERS</a></li>
+			
+            </ul>
+         
+		</div>
+		
+    <div role="tabpanel" class="tab-pane" id="messages">
+    	
+    	<div>
+    		<H3 id='tractSelected'></H3>
+    		BANANAS <p id="selectedBanana"></p>
+    		CHILD CARE LINKS <p id="selectedCCL"></p>
+    		DAVIS STREET <p id="selectedDAVIS"></p>
+    		CHILDREN AND FAMILY RESOURCES <p id="selectedDAVIS"></p>
+
+
+    	</div>
+
+    </div>
+    <div role="tabpanel" class="tab-pane" id="settings">...</div>
+  </div>
+
+</div>
+</div>
+<div id='mapid' class='col-md-8'></div>
+
+</div>
+
+<script type="text/javascript">
+$('#myTabs a').click(function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+})
+//create event for option box
+var theType = 'APALL';
+var theAgency = 'sites'
+var selectedProperty;
+	
+var map = L.map( 'mapid', {
+    center: [37.652294, -121.94727],
+    minZoom: 10,
+    zoom: 2
+});
+
+
+L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright" title="OpenStreetMap" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" title="MapQuest" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" width="16" height="16">',
+    subdomains: ['otile1','otile2','otile3','otile4']
+}).addTo( map );
+
+
+
+var myStyle = {
+	color:"#0000ff",
+	weight:1
+}
+
+//add first time load of data
+var siteLayer =	L.geoJson(sites,
+	{style:function(feature){
+		switch(feature.properties.APALL_sites){
+			case 0: return{color:"#000000",weight:.5};
+			default: return myStyle;
+
+			}
+		},
+		onEachFeature:function(feature,layer){
+			layer.bindPopup("TRACT: " + feature.properties.TRACTCE)
+			
+		}})
+
+var theSites = L.layerGroup([siteLayer]).addTo(map);
+
+function getColor(d) {
+    return d > 5 ? '#7f2704' :
+           d > 3  ? '#fd9243' :
+           d > 1  ? '#fff5eb' :
+                     '#FFFFFF';
+}
+
+function getOpacity(d){
+	return d>0 ? .7:
+				0;
+}
+
+function style(feature) {
+    return {
+        fillColor: getColor(feature.properties[selectedProperty]),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: getOpacity(feature.properties[selectedProperty])
+    };
+}
+
+function updateMap(){
+	theSites.clearLayers()
+	var labelMarkers = []
+	//change siteLayer
+	selectedProperty = theAgency + '_' + theType
+	var siteLayer =	L.geoJson(sites,{
+		style:style,
+		onEachFeature:function(feature, layer){
+			 layer.bindPopup(feature.properties.TRACTCE);
+			 layer.on('click',doThis)
+			 try{
+			 	
+			 	if(feature.properties[theAgency + '_' + theType] > 0){
+			 	label = L.marker(layer.getBounds().getCenter(), {
+			 	icon:L.divIcon({
+			 		className:'label',
+			 		html:"<h5>" + feature.properties[theAgency + '_' + theType] + "</h5>",
+			 		iconSize:[100, 40]
+
+			 	})
+			 	})
+			 	theSites.addLayer(label)
+			 }}
+			 catch(e){
+			 	console.log("So what")
+			 }
+		//add click event
+		
+
+		}
+		
+	})
+
+	theSites.addLayer(siteLayer);
+}
+
+function doThis(e){
+	$('#tractSelected').text(e.target.feature.properties['NAMELSAD'])
+}
+
+//change things on user select
+$("#siteType a").click(function(a){
+	theType = $(this).attr('data-match');
+	console.log(theType)
+	updateMap()
+	$("#lblType").text("TYPE: " + $(this).text())
+	//remove layer
+})
+
+$("#agency a").click(function(a){
+	theAgency = $(this).attr('data-match');
+	console.log(theAgency)
+	updateMap()
+	$("#lblAgency").text("AGENCY: " + $(this).text())
+	//remove layer
+})
+	
+
+
+
+</script>
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</body>
+</html>
