@@ -17,13 +17,29 @@
 </head>
 <style>
 #mapid {height:680px;}
+
+#mapid{
+	background-color:lightblue;
+	-moz-box-shadow:    3px 3px 5px 3px #ccc;
+  -webkit-box-shadow: 3px 3px 5px 3px #ccc;
+  box-shadow:         3px 3px 5px 3px #ccc;
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+border-radius: 10px; /* future proofing */
+-khtml-border-radius: 10px; /* for old Konqueror browsers */
+
+}
 .label {color:blue;font-weight: bold; display:none;}
 </style>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-       <h2 style='color:white'>Alternative Payment Vouchers</h2>
+        <div class="row">
+       		<div class='col-md-5'><h4 style='color:yellow'>Alternative Payment Vouchers</h4></div>
+        	<div class='col-md-3'><h4 style='color:WHITE' id="lblAgency"></h4></div>
+			<div class='col-md-3'><h4 style='color:WHITE' id="lblType"></h4></div>div>
+        </div>
         </div>
       </div>
     </div>
@@ -66,12 +82,13 @@ at least one site</p>
     </div>
 		
 		
-    <div role="tabpanel" class="tab-pane" id="profile"><h5 id="lblAgency"></h5>
+    <div role="tabpanel" class="tab-pane" id="profile">
+    	<h5 id="lblAgency"></h5>
 		<h5 id="lblType"></h5>
-		
-		<H4>FIND # OF PROVIDERS BY AGENCY</H4>
+			
+		 <h5 style="margin-top:30px"><strong>STEP 2:</strong> SELECT TO VIEW PROVIDERS OR CHILDREN</h5>
 
-		
+		<hr />
 		
 		<h5>HOW MANY PROVIDER SITES FOR THAT AGENCY</h5>	
             <ul class="nav" id='siteType'>
@@ -158,7 +175,7 @@ map.on("zoomend",function(e){
 	//{
 	//	$(".label").show();
 	//}
-	console.log(e)
+	
 
 })
 
