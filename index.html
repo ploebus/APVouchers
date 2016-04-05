@@ -30,6 +30,9 @@ border-radius: 10px; /* future proofing */
 
 }
 .label {color:blue;font-weight: bold; display:none;}
+.navbar-inverse{
+	background-color: #333333;
+}
 </style>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -38,7 +41,7 @@ border-radius: 10px; /* future proofing */
         <div class="row">
        		<div class='col-md-5'><h4 style='color:yellow'>Alternative Payment Vouchers</h4></div>
         	<div class='col-md-3'><h4 style='color:WHITE' id="lblAgency"></h4></div>
-			<div class='col-md-3'><h4 style='color:WHITE' id="lblType"></h4></div>div>
+			<div class='col-md-3'><h4 style='color:WHITE' id="lblType"></h4></div>
         </div>
         </div>
       </div>
@@ -85,8 +88,7 @@ at least one site</p>
     <div role="tabpanel" class="tab-pane" id="profile">
     	<h5 id="lblAgency"></h5>
 		<h5 id="lblType"></h5>
-			
-		 <h5 style="margin-top:30px"><strong>STEP 2:</strong> SELECT TO VIEW PROVIDERS OR CHILDREN</h5>
+		<h5 style="margin-top:30px"><strong>STEP 2:</strong> SELECT TO VIEW PROVIDERS OR CHILDREN</h5>
 
 		<hr />
 		
@@ -114,25 +116,13 @@ at least one site</p>
     	
     	<div>
     		<H3 id='tractSelected'></H3>
-    		<h5>BY AGENCY</h5>
-			<ul class="nav" id='agency_kid'>
-              <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
-			  <li><a data-match= 'AK_BAN' href="#">BANANAS</a></li>
-              <li><a data-match= 'AK_LINK' href="#about">CHILD CARE LINKS</a></li>
-              <li><a data-match= 'AK_CFCR' href="#contact">CHILDREN AND FAMILY RESOURCE CENTER</a></li>
-              <li><a data-match= 'AK_DAVIS' href="#contact">DAVIS STREET</a></li>
-              <li><a data-match= 'AK_C4' href="#contact">4C OF ALAMEDA COUNTY</a></li>
-			
-            </ul>
-            <hr />
-		<h5>BY TYPE OF SITE</h5>	
-            <ul class="nav" id='siteType_kid'>
-              <li class="active"><a data-match= 'KID' href="#">ALL AGES</a></li>
-			  <li><a data-match= 'INF' href="#">INFANTS</a></li>
-              <li><a data-match= 'TOT' href="#about">TODDLERS</a></li>
-              <li><a data-match= 'PRE' href="#contact">PRESCHOOL</a></li>
-			
-            </ul>
+    		<table id='tractData' class='table table-striped'>
+    		<thead>
+    		<th>Category</th>
+    		<th>Selected Agency</th>
+    		<th>All Agencies</th>
+    		</thead>
+    		</table>
 
     	</div>
 
@@ -156,28 +146,13 @@ var theType = 'APALL';
 var theAgency = 'sites'
 var selectedProperty;
 	
-var map = L.map("mapid").setView([37.75, -122.23], 10);
+var map = L.map("mapid").setView([37.61912, -121.93285], 10);
 
 L.esri.basemapLayer("Gray").addTo(map);
 
-map.on("zoomend",function(e){
-	if(map.getZoom()> 11){
-		$(".label").show();
-	}
-	else
-	{
-		$(".label").hide();
-	}
-	//if(map.getZoom > 9){
-	//	$(".label").hide();
-	//}
-	//else
-	//{
-	//	$(".label").show();
-	//}
-	
+map.on("zoomend",checkZoom)
 
-})
+
 
 //L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
   //  attribution: '&copy; <a href="http://osm.org/copyright" title="OpenStreetMap" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" title="MapQuest" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" width="16" height="16">',
@@ -216,6 +191,17 @@ var siteLayer =	L.geoJson(tracts,
 		}})
 
 var theSites = L.layerGroup([siteLayer]).addTo(map);
+
+//HELPERS
+
+function checkZoom(){
+	if(map.getZoom()> 11){
+		$(".label").show();
+	}
+	else{
+		$(".label").hide();
+	}
+}
 
 function getColor(d) {
     return d > 5 ? '#7f2704' :
@@ -276,10 +262,33 @@ function updateMap(){
 	})
 
 	theSites.addLayer(siteLayer);
+	checkZoom();
 }
 
 function doThis(e){
-	$('#tractSelected').text(e.target.feature.properties['NAMELSAD'])
+	
+	getTractData(e.target.feature.properties['TRACTCE']);
+
+}
+
+function getTractData(t){
+
+	for(var i = 0; i<361 ; i++){
+		if(tracts.features[i].properties['TRACTCE'] == t){
+			totalProviders = tracts.features[i].properties[theAgency +'_CTR'] + tracts.features[i].properties[theAgency +'_FCC'] + tracts.features[i].properties[theAgency +'_FFN'];
+			$('#tractSelected').text(tracts.features[i].properties['NAMELSAD']);
+			$("#tractData").find("tr:gt(0)").remove()
+			$("#tractData").append("<tr class='info'><td>Providers:</td><td>" + totalProviders + "</td><td>" + tracts.features[i].properties['AP_ALL_TRACT'] + "</td></tr>")
+			$("#tractData").append("<tr><td>Child Care Centers:</td><td>" + tracts.features[i].properties[theAgency +'_CTR'] + "</td><td>" + tracts.features[i].properties['AP_ALL_CTR'] + "</td></tr>")
+			$("#tractData").append("<tr><td>Family Child Care:</td><td>" + tracts.features[i].properties[theAgency +'_FCC'] + "</td><td>" + tracts.features[i].properties['AP_ALL_FCC'] + "</td></tr>")
+			$("#tractData").append("<tr><td>Friends and Family:</td><td>" + tracts.features[i].properties[theAgency +'_FFN'] + "</td><td>" + tracts.features[i].properties['AP_ALL_FFN'] + "</td></tr>")
+			$("#tractData").append("<tr class='info'><td>Children Served:</td><td>" + tracts.features[i].properties[theAgency +'_KID'] + "</td><td>" + tracts.features[i].properties['AP_ALL_KID'] + "</td></tr>")
+			$("#tractData").append("<tr><td>Infants:</td><td>" + tracts.features[i].properties[theAgency +'_INF'] + "</td><td>" + tracts.features[i].properties['AP_ALL_INF'] + "</td></tr>")
+			$("#tractData").append("<tr><td>Toddlers:</td><td>" + tracts.features[i].properties[theAgency +'_TOT'] + "</td><td>" + tracts.features[i].properties['AP_ALL_TOT'] + "</td></tr>")
+			$("#tractData").append("<tr><td>Preschoolers:</td><td>" + tracts.features[i].properties[theAgency +'_PRE'] + "</td><td>" + tracts.features[i].properties['AP_ALL_PRE'] + "</td></tr>")
+		}
+	}
+
 }
 
 //change things on user select
