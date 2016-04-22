@@ -57,6 +57,7 @@ border-radius: 10px; /* future proofing */
     <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">HOME</a></li>
     <li role="presentation" class="sites"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">SITES</a></li>
     <li role="presentation" class="kids"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">KIDS</a></li>
+    <li role="presentation" class="kids"><a href="#layers" aria-controls="layers" role="tab" data-toggle="tab">LAYERS</a></li>
    
   </ul>
 
@@ -107,7 +108,7 @@ border-radius: 10px; /* future proofing */
 			
             </ul>
          
-		</div>
+	</div>
 		
     <div role="tabpanel" class="tab-pane" id="messages">
     	
@@ -124,7 +125,34 @@ border-radius: 10px; /* future proofing */
     	</div>
 
     </div>
-    <div role="tabpanel" class="tab-pane" id="settings">...</div>
+    
+    <div role="tabpanel" class="tab-pane" id="layers">
+   	 <h3>Add layers to the map</h3>
+   	 Check the following options to add to the map
+    <hr />	
+   	<div class="radio">
+  <label>
+    <input type="radio" name="optionsRadios" id="optionsRadios1" value="city" checked>
+   Add city and place limits to the map
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="optionsRadios" id="optionsRadios2" value="zip">
+    Add zip code boundaries to the map
+  </label>
+</div>
+<div class="radio disabled">
+  <label>
+    <input type="radio" name="optionsRadios" id="optionsRadios3" value="center" disabled>
+    Add all licensed child care centers to the map
+  </label>
+</div>
+<hr />
+           
+    
+    
+    </div>
   </div>
 
 </div>
@@ -145,16 +173,34 @@ var selectedProperty;
 	
 var map = L.map("mapid").setView([37.61912, -121.93285], 10);
 
-L.esri.basemapLayer("Gray").addTo(map);
+var tiles = L.esri.basemapLayer("Gray").addTo(map);
 
 map.on("zoomend",checkZoom)
 
 
 
-//L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-  //  attribution: '&copy; <a href="http://osm.org/copyright" title="OpenStreetMap" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" title="MapQuest" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" width="16" height="16">',
-    //subdomains: ['otile1','otile2','otile3','otile4']
-//}).addTo( map );
+//ADD OVERLAYS
+
+var cityGEO = $.getJSON("places.geojson",function(data){
+	L.geoJson(data,{style:cityStyle,
+		onEachFeature:function(feature,layer){
+			layer.bindPopup(feature.properties.NAMELSAD);
+		}}).addTo(overlayMaps)
+});
+
+
+var cartoSites = L.layerGroup().addTo(map);
+
+//var apGEO = $.getJSON("http://ploebus.cartodb.com/api/v1/sql?q="+sql+"&format=geojson&callback=?",function(data){
+//	L.geoJson(data,{style:cityStyle}).addTo(cartoSites)
+//});
+
+var zipGEO = $.getJSON("zip.geojson",function(data){
+	L.geoJson(data,{style:cityStyle,
+		onEachFeature:function(feature,layer){
+			layer.bindPopup("Zip Code: " + feature.properties.postalcode);
+		}}).addTo(overlayMaps1)
+});
 
 
 
@@ -162,18 +208,21 @@ map.on("zoomend",checkZoom)
 
 
 
-
+var cityStyle =
+	{fillOpacity:0,
+		weight:1,
+		color:'#333333'}
 
 var myStyle = {
 	color:'#333333',
-	weight:.5,
+	weight:.2,
 	dashArray:3,
 	fillColor:'white',
 	opacity:.3
 
 }
 
-//add first time load of data
+
 var siteLayer =	L.geoJson(tracts,
 	{style:function(feature){
 		switch(feature.properties.APALL_sites){
@@ -187,9 +236,37 @@ var siteLayer =	L.geoJson(tracts,
 			
 		}})
 
+
+
+//layer groups
 var theSites = L.layerGroup([siteLayer]).addTo(map);
 
+var overlayMaps = L.layerGroup();
+overlayMaps.addTo(map);
+
+var overlayMaps1 = L.layerGroup();
+overlayMaps1.addTo(map);
+
+var baseMaps = {
+	"grey": tiles
+};
+
+var layerSwitcher = {
+	"Cities": overlayMaps,
+	"Zips":overlayMaps1
+};
+
+L.control.layers(baseMaps,layerSwitcher).addTo(map)
+//zipGeo.addTo(map);
 //HELPERS
+function addTopTen(type){
+	cartoSites.clearLayers();
+	sql = encodeURIComponent("SELECT " + type + ",the_geom,row_number() OVER(ORDER BY  " + type + " DESC) AS position FROM apvouchers order by  " + type + " desc limit 5");
+	
+	$.getJSON("http://ploebus.cartodb.com/api/v1/sql?q="+sql+"&format=geojson&callback=?", function(data){
+	L.geoJson(data).addTo(cartoSites);
+	});
+}
 
 function checkZoom(){
 	if(map.getZoom()> 11){
@@ -208,7 +285,7 @@ function getColor(d) {
 }
 
 function getOpacity(d){
-	return d>0 ? .7:
+	return d > 0 ? .7:
 				0;
 }
 
@@ -228,6 +305,8 @@ function updateMap(){
 	var labelMarkers = []
 	//change siteLayer
 	selectedProperty = theAgency + '_' + theType
+	console.log(selectedProperty.toLowerCase())
+	addTopTen(selectedProperty.toLowerCase());
 	var siteLayer =	L.geoJson(tracts,{
 		style:style,
 		onEachFeature:function(feature, layer){
