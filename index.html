@@ -10,7 +10,7 @@
 <script src="leaflet/leaflet.label.js"></script>
 <script src="js/jquery.js"></script>
 <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
-<script src="APVoucherSites.js"></script>
+<script src="sites2023.js"></script>
 
 <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -55,35 +55,34 @@ at least one site</p>
 		
 		
     <div role="tabpanel" class="tab-pane" id="profile"><h5 id="lblAgency"></h5>
-		<h5 id="lblType"></h5>
-		
-		<H4>FIND # OF PROVIDERS BY AGENCY</H4>
+			<h5 id="lblType"></h5>
+			
+			<H4>FIND # OF PROVIDERS BY AGENCY</H4>
 
-		<h5>BY AGENCY</h5>
-		<ul class="nav" id='agency'>
-              <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
-			  <li><a data-match= 'AP_BAN' href="#">BANANAS</a></li>
-              <li><a data-match= 'AP_CHILD' href="#about">CHILD CARE LINKS</a></li>
-              <li><a data-match= 'AP_CFCR' href="#contact">CHILDREN AND FAMILY RESOURCE CENTER</a></li>
-              <li><a data-match= 'AP_DAVIS' href="#contact">DAVIS STREET</a></li>
-              <li><a data-match= 'AP_C4' href="#contact">4C OF ALAMEDA COUNTY</a></li>
-			
-            </ul>
-            <hr />
-		<h5>BY TYPE OF SITE</h5>	
-            <ul class="nav" id='siteType'>
-              <li class="active"><a data-match= 'sites' href="#">ALL SITES</a></li>
-			  <li><a data-match= 'FFN' href="#">FRIENDS AND FAMILY</a></li>
-              <li><a data-match= 'FCC' href="#about">FAMILY CHILD CARE</a></li>
-              <li><a data-match= 'CTR' href="#contact">CHILD CARE CENTERS</a></li>
-			
-            </ul>
+			<h5>BY AGENCY</h5>
+				<ul class="nav" id='agency'>
+	        <li class="active"><a data-match= 'AP_ALL' href="#">ALL AGENCIES</a></li>
+	  			<li><a data-match= 'AP_BAN' href="#">BANANAS</a></li>
+	        <li><a data-match= 'AP_HIVELY' href="#about">HIVELY</a></li>
+	        <li><a data-match= 'AP_DAVIS' href="#contact">DAVIS STREET</a></li>
+	        <li><a data-match= 'AP_4CS' href="#contact">4C OF ALAMEDA COUNTY</a></li>
+				</ul>
+      <hr />
+		
+			<h5>BY TYPE OF SITE</h5>	
+	      <ul class="nav" id='siteType'>
+	        <li class="active"><a data-match= 'sites' href="#">ALL SITES</a></li>
+	  			<li><a data-match= 'FFN' href="#">FRIENDS AND FAMILY</a></li>
+	        <li><a data-match= 'FCC' href="#about">FAMILY CHILD CARE</a></li>
+	        <li><a data-match= 'Center' href="#contact">CHILD CARE CENTERS</a></li>
+	        <li><a data-match= 'Exempt' href="#contact">Exempt Centers</a></li>
+	      </ul>
          
 		</div>
 		
     <div role="tabpanel" class="tab-pane" id="messages">
     	
-    	<div>
+    <div>
     		<H3 id='tractSelected'></H3>
     		BANANAS <p id="selectedBanana"></p>
     		CHILD CARE LINKS <p id="selectedCCL"></p>
